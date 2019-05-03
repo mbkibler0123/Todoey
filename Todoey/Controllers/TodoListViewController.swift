@@ -7,20 +7,20 @@
 //
 
 import UIKit
-
+import CoreData
 //because we inherited the UITableViewController we do not need to set up any IPBOUTlets
 class TodoListViewController: UITableViewController {
 
     //these are the TODOS within an array
     var itemArray = [Item]()
 
-    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
     
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     override func viewDidLoad() {
         super.viewDidLoad()
      
-        print(dataFilePath)
+        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
         
 //        let newItem = Item()
 //        newItem.title = "Find Mike"
@@ -41,10 +41,6 @@ class TodoListViewController: UITableViewController {
         
     }
 
-    
-    
-    
-    
     
     
     // Mark -Tableview Datasource Methods
@@ -82,19 +78,12 @@ class TodoListViewController: UITableViewController {
         
     }
     
-    
-    
-    
-    
-    
-    
-    
     // Mark - Tableview Delegate Methods
     
    //this method will allow you to print whatever cell you click on in thi sumulator print to the debug console.
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        
+
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done
         
        //the above line does exactly the same as the bottom if statement
@@ -116,17 +105,7 @@ class TodoListViewController: UITableViewController {
         
     }
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
     //MARK - Add New Items
     
     @IBAction func addButtonpressed(_ sender: UIBarButtonItem) {
@@ -139,8 +118,9 @@ class TodoListViewController: UITableViewController {
             // what will happen when the user clicks the add button on the ui alert
             
             
-            let newitem = Item()
+            let newitem = Item(context: self.context)
             newitem.title = textField.text!
+            newitem.done = false
             
             self.itemArray.append(newitem) //force unwrap because it will never equal nil.
         
@@ -163,20 +143,11 @@ class TodoListViewController: UITableViewController {
     }
     
     
-    
-    
     func saveitems() {
-        
-        let encoder = PropertyListEncoder()
-        
-        
         do {
-            let data = try encoder.encode(itemArray)
-            
-            try data.write(to: dataFilePath!) //datafilepath must be declared at the global level to tap into it here
-            
+           try context.save()
         } catch {
-            print("Error encoding item array, \(error)")
+        print("error saving context \(error)")
             
         }
         tableView.reloadData()
@@ -185,23 +156,46 @@ class TodoListViewController: UITableViewController {
     
 
     func loadItems() {
+        let request : NSFetchRequest<Item> = Item.fetchRequest()
         
-        if let data = try? Data(contentsOf: dataFilePath!){
-            
-            let decoder = PropertyListDecoder()
-            
-            do{
-            itemArray = try decoder.decode([Item].self, from: data)
-            }
-            
-            catch{
-                print("error decoding Item Array, \(error)")
-            }
-        }
-        
+        do {
+        itemArray = try context.fetch(request)
+    } catch {
+        print("error fetching data from context \(error)")
+    
     }
     
     
     
+    }
+    
+    
 }
 
+//Mark: - Search Bar Methods
+extension TodoListViewController: UISearchBarDelegate {
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+    
+        let request : NSFetchRequest<Item> = Item.fetchRequest()
+        
+        let predicate = NSPredicate(format: "title CONTAINS [cd]%@", searchBar.text!)
+        
+        request.predicate = predicate
+        
+        let sortDescriptor = NSSortDescriptor(key: "title", ascending: true)
+        
+        request.sortDescriptors = [sortDescriptor]
+        
+        do {
+            itemArray = try context.fetch(request)
+        } catch {
+            print("error fetching data from context \(error)")
+            
+        }
+        
+        tableView.reloadData()
+        
+    }
+
+}
