@@ -155,14 +155,14 @@ class TodoListViewController: UITableViewController {
     }
     
 
-    func loadItems() {
-        let request : NSFetchRequest<Item> = Item.fetchRequest()
-        
+    func loadItems(with request : NSFetchRequest<Item> = Item.fetchRequest()) {
+
+
         do {
         itemArray = try context.fetch(request)
     } catch {
         print("error fetching data from context \(error)")
-    
+
     }
     
     
@@ -179,23 +179,28 @@ extension TodoListViewController: UISearchBarDelegate {
     
         let request : NSFetchRequest<Item> = Item.fetchRequest()
         
-        let predicate = NSPredicate(format: "title CONTAINS [cd]%@", searchBar.text!)
+        request.predicate = NSPredicate(format: "title CONTAINS [cd]%@", searchBar.text!)
         
-        request.predicate = predicate
-        
-        let sortDescriptor = NSSortDescriptor(key: "title", ascending: true)
-        
-        request.sortDescriptors = [sortDescriptor]
-        
-        do {
-            itemArray = try context.fetch(request)
-        } catch {
-            print("error fetching data from context \(error)")
-            
-        }
-        
-        tableView.reloadData()
+        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+    
+        loadItems(with: request)
         
     }
 
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.text?.count == 0 {
+            loadItems()
+            
+            
+            DispatchQueue.main.async {
+                
+                searchBar.resignFirstResponder()
+            }
+
+        }
+        
+
+    }
+    
 }
