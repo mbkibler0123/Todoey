@@ -13,6 +13,16 @@ class TodoListViewController: UITableViewController {
 
     //these are the TODOS within an array
     var itemArray = [Item]()
+    
+    var selectedCategory : Category? {
+        
+        didSet {
+            loadItems()
+        }
+        
+        
+        
+    }
 
     
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
@@ -37,7 +47,7 @@ class TodoListViewController: UITableViewController {
         
         
         
-        loadItems()
+       
         
     }
 
@@ -121,6 +131,8 @@ class TodoListViewController: UITableViewController {
             let newitem = Item(context: self.context)
             newitem.title = textField.text!
             newitem.done = false
+            newitem.parentCategory = self.selectedCategory
+            
             
             self.itemArray.append(newitem) //force unwrap because it will never equal nil.
         
@@ -155,8 +167,28 @@ class TodoListViewController: UITableViewController {
     }
     
 
-    func loadItems(with request : NSFetchRequest<Item> = Item.fetchRequest()) {
+    func loadItems(with request : NSFetchRequest<Item> = Item.fetchRequest(), predicate : NSPredicate? = nil){
 
+        
+        
+        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
+        
+        if let additionalPredicate = predicate {
+            
+            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate,additionalPredicate])
+            
+        } else {
+            
+            request.predicate = categoryPredicate
+            
+        }
+        
+        // below code is written above using optional binding
+//        let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate,predicate])
+//
+//
+//            request.predicate = compoundPredicate
+        
 
         do {
         itemArray = try context.fetch(request)
@@ -165,7 +197,7 @@ class TodoListViewController: UITableViewController {
 
     }
     
-    
+    tableView.reloadData()
     
     }
     
@@ -179,11 +211,11 @@ extension TodoListViewController: UISearchBarDelegate {
     
         let request : NSFetchRequest<Item> = Item.fetchRequest()
         
-        request.predicate = NSPredicate(format: "title CONTAINS [cd]%@", searchBar.text!)
+        let predicate = NSPredicate(format: "title CONTAINS [cd]%@", searchBar.text!)
         
         request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
     
-        loadItems(with: request)
+        loadItems(with: request, predicate: predicate)
         
     }
 
