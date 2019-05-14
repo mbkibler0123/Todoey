@@ -17,7 +17,7 @@ class TodoListViewController: UITableViewController {
     var selectedCategory : Category? {
         
         didSet {
-            loadItems()
+//            loadItems()
         }
         
         
@@ -128,14 +128,14 @@ class TodoListViewController: UITableViewController {
             // what will happen when the user clicks the add button on the ui alert
             
             
-            let newitem = Item(context: self.context)
-            newitem.title = textField.text!
-            newitem.done = false
-            newitem.parentCategory = self.selectedCategory
-            
-            
-            self.itemArray.append(newitem) //force unwrap because it will never equal nil.
-        
+//            let newitem = Item(context: self.context)
+//            newitem.title = textField.text!
+//            newitem.done = false
+//            newitem.parentCategory = self.selectedCategory
+//
+//
+//            self.itemArray.append(newitem) //force unwrap because it will never equal nil.
+//
           
             self.saveitems()
             
@@ -167,72 +167,73 @@ class TodoListViewController: UITableViewController {
     }
     
 
-    func loadItems(with request : NSFetchRequest<Item> = Item.fetchRequest(), predicate : NSPredicate? = nil){
-
-        
-        
-        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
-        
-        if let additionalPredicate = predicate {
-            
-            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate,additionalPredicate])
-            
-        } else {
-            
-            request.predicate = categoryPredicate
-            
-        }
-        
-        // below code is written above using optional binding
-//        let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate,predicate])
+//    func loadItems(with request : NSFetchRequest<Item> = Item.fetchRequest(), predicate : NSPredicate? = nil){
 //
 //
-//            request.predicate = compoundPredicate
-        
-
-        do {
-        itemArray = try context.fetch(request)
-    } catch {
-        print("error fetching data from context \(error)")
-
-    }
-    
-    tableView.reloadData()
-    
-    }
+//
+//        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
+//
+//        if let additionalPredicate = predicate {
+//
+//            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate,additionalPredicate])
+//
+//        } else {
+//
+//            request.predicate = categoryPredicate
+//
+//        }
+//
+//        // below code is written above using optional binding
+////        let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate,predicate])
+////
+////
+////            request.predicate = compoundPredicate
+//
+//
+//        do {
+//        itemArray = try context.fetch(request)
+//    } catch {
+//        print("error fetching data from context \(error)")
+//
+//    }
+//
+//    tableView.reloadData()
+//
+//    }
     
     
 }
 
 //Mark: - Search Bar Methods
-extension TodoListViewController: UISearchBarDelegate {
-    
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-    
-        let request : NSFetchRequest<Item> = Item.fetchRequest()
-        
-        let predicate = NSPredicate(format: "title CONTAINS [cd]%@", searchBar.text!)
-        
-        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
-    
-        loadItems(with: request, predicate: predicate)
-        
-    }
+//extension TodoListViewController: UISearchBarDelegate {
+//
+//    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+//
+//        let request : NSFetchRequest<Item> = Item.fetchRequest()
+//
+//        let predicate = NSPredicate(format: "title CONTAINS [cd]%@", searchBar.text!)
+//
+//        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+//
+//        loadItems(with: request, predicate: predicate)
+//
+//    }
+//
+//
+//    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+//        if searchBar.text?.count == 0 {
+//            loadItems()
+//
+//
+//            DispatchQueue.main.async {
+//
+//                searchBar.resignFirstResponder()
+//            }
+//
+//        }
+//
+//
+//    }
+//
+//}
 
-    
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        if searchBar.text?.count == 0 {
-            loadItems()
-            
-            
-            DispatchQueue.main.async {
-                
-                searchBar.resignFirstResponder()
-            }
-
-        }
-        
-
-    }
-    
-}

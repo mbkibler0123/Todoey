@@ -7,9 +7,15 @@
 //
 
 import UIKit
-import CoreData
+import RealmSwift
+
 class CategoryViewController: UITableViewController {
 
+    
+    let realm = try! Realm() //codesmell
+    
+    
+    
     var categoryArray = [Category]()
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 
@@ -18,7 +24,7 @@ class CategoryViewController: UITableViewController {
         super.viewDidLoad()
 
         
-        loadCategories()
+//        loadCategories()
         
         
 
@@ -79,13 +85,12 @@ class CategoryViewController: UITableViewController {
         
         let action = UIAlertAction(title: "Add Category", style: .default) { (action) in
             
-            let newCategory = Category(context: self.context)
+            let newCategory = Category()
             newCategory.name = textField.text!
         
-            
             self.categoryArray.append(newCategory)
             
-            self.saveCategory()
+            self.save(category: newCategory)
             
         }
         
@@ -104,11 +109,13 @@ class CategoryViewController: UITableViewController {
        
     }
         
-    func saveCategory() {
+    func save(category:Category) {
         
         do {
             
-            try context.save()
+            try realm.write {
+                realm.add(categoryArray)
+            }
             
             } catch {
             
@@ -120,23 +127,23 @@ class CategoryViewController: UITableViewController {
         
         }
     
-    func loadCategories (with request : NSFetchRequest<Category> = Category.fetchRequest()) {
-        
-        do {
-            
-            categoryArray = try context.fetch(request)
-            
-            
-        } catch {
-            
-            print("there was an error, \(error)")
-            
-            
-        }
-        
-        
-        
-    }
+//    func loadCategories()
+    
+//        do {
+//
+//            categoryArray = try context.fetch(request)
+//
+//
+//        } catch {
+//
+//            print("there was an error, \(error)")
+//
+//
+//        }
+//
+//
+//
+//    }
 
     
 }

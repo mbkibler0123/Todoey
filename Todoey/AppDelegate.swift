@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreData
+import RealmSwift
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -18,6 +19,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         
+        print(Realm.Configuration.defaultConfiguration.fileURL)
+        
+
+//        let data = Data()
+//        data.name = "Michael"
+//        data.age = 25
+//
+        
+        do{
+
+            let realm = try Realm()
+            
+        }catch{
+            print("error, \(error)")
+            
+        }
+        
+    
         return true
     }
 
@@ -57,5 +76,5 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
 
-}
 
+}
