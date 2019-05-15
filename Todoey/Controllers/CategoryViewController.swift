@@ -9,12 +9,13 @@
 import UIKit
 import RealmSwift
 
-class CategoryViewController: UITableViewController {
+
+class CategoryViewController: SwipeTableViewController {
 
     
     let realm = try! Realm() //codesmell
     
-
+    
     var categoryArray: Results<Category>?
     
 
@@ -25,7 +26,7 @@ class CategoryViewController: UITableViewController {
         
         loadCategories()
         
-        
+        tableView.rowHeight = 80
 
     }
     
@@ -37,14 +38,26 @@ class CategoryViewController: UITableViewController {
         
     }
     
+    //from cocoapods website for Swipe cell Kit
+    
+//    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+//        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell") as! SwipeTableViewCell
+//        cell.delegate = self
+//        return cell
+//    }
+    
+    
+    
+    
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
         
     
         cell.textLabel?.text = categoryArray?[indexPath.row].name ?? "No categories added"
         
-        
+
         
     return cell
        
@@ -72,7 +85,31 @@ class CategoryViewController: UITableViewController {
         
     }
     
-
+    
+    override func updateModel(at indexPath: IndexPath) {
+    
+        if let categoryForDeletion = self.categoryArray?[indexPath.row]{
+            do {
+                try self.realm.write {
+                    
+                    self.realm.delete(categoryForDeletion)
+                }
+            
+            } catch{
+                print("error,\(error)")
+            }
+            
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
     //Mark - Add button Functionality
     
     @IBAction func addButtonpressed(_ sender: UIBarButtonItem) {
@@ -133,20 +170,18 @@ class CategoryViewController: UITableViewController {
         
     }
     
-    
-    
+
     
     
 
-
-    
 }
 
+
+ 
+    
+
     
     
-    
-    
-    
-    
+
 
 

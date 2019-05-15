@@ -95,6 +95,15 @@ class TodoListViewController: UITableViewController {
             }
         }
         
+        
+        
+        
+        
+        
+        
+        
+        
+        
         tableView.reloadData()
         
         tableView.deselectRow(at: indexPath, animated: true)
