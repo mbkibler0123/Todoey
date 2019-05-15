@@ -17,7 +17,7 @@ class TodoListViewController: UITableViewController {
     //these are the TODOS within an array
     var todoItems: Results <Item>?
     let realm = try! Realm()
-    
+    let date = Date()
     var selectedCategory : Category? {
         
         didSet {
@@ -86,23 +86,24 @@ class TodoListViewController: UITableViewController {
    //this method will allow you to print whatever cell you click on in thi sumulator print to the debug console.
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
+        
+//        updating data using realm
+        if let item = todoItems?[indexPath.row]{
 
-//        todoItems?[indexPath.row].done = !todoItems[indexPath.row].done
-        
-       //the above line does exactly the same as the bottom if statement
-        
-//        if itemArray[indexPath.row].done == false {
-//            itemArray[indexPath.row].done = true
-//        }else{
-//            itemArray[indexPath.row].done = false
-//        }
-    
-    
-//
-//        saveitems()
+            do{
+            try realm.write {
+                item.done = !item.done // use this line of code to update your items within the simulator
+                
+//                realm.delete(item) use this line of code to delete items within the simlator
+            }
+        }catch {
+            print("error updating, \(error)")
 
+
+            }
+        }
         
-        
+        tableView.reloadData()
         
         tableView.deselectRow(at: indexPath, animated: true)
         
@@ -126,6 +127,7 @@ class TodoListViewController: UITableViewController {
                 try self.realm.write {
                     let newitem = Item()
                     newitem.title = textField.text!
+                    newitem.dateCreated = Date()
                     currentCategory.items.append(newitem)
                 }
                 
@@ -155,7 +157,7 @@ class TodoListViewController: UITableViewController {
 
     func loadItems(){
 
-        todoItems = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true)
+        todoItems = selectedCategory?.items.sorted(byKeyPath: "dateCreated", ascending: true)
         
     tableView.reloadData()
 
@@ -165,36 +167,33 @@ class TodoListViewController: UITableViewController {
 
 }
 //Mark: - Search Bar Methods
-//extension TodoListViewController: UISearchBarDelegate {
-//
-//    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-//
-//        let request : NSFetchRequest<Item> = Item.fetchRequest()
-//
-//        let predicate = NSPredicate(format: "title CONTAINS [cd]%@", searchBar.text!)
-//
-//        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
-//
-//        loadItems(with: request, predicate: predicate)
-//
-//    }
-//
-//
-//    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-//        if searchBar.text?.count == 0 {
-//            loadItems()
-//
-//
-//            DispatchQueue.main.async {
-//
-//                searchBar.resignFirstResponder()
-//            }
-//
-//        }
-//
-//
-//    }
-//
-//}
+extension TodoListViewController: UISearchBarDelegate {
+
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        
+        todoItems = todoItems?.filter("title CONTAINS[cd]%@",searchBar.text!).sorted(byKeyPath: "dateCreated", ascending: true)
+        
+        tableView.reloadData()
+        
+        
+    }
+
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.text?.count == 0 {
+            loadItems()
+
+
+            DispatchQueue.main.async {
+
+                searchBar.resignFirstResponder()
+            }
+
+        }
+
+
+    }
+
+}
 
 
