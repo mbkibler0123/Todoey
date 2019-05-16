@@ -26,7 +26,7 @@ class CategoryViewController: SwipeTableViewController {
         
         loadCategories()
         
-        tableView.rowHeight = 80
+//        tableView.rowHeight = 80
 
     }
     
@@ -101,13 +101,6 @@ class CategoryViewController: SwipeTableViewController {
             
         }
     }
-    
-    
-    
-    
-    
-    
-    
     
     
     //Mark - Add button Functionality

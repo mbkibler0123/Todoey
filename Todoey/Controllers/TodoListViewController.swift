@@ -9,7 +9,7 @@
 import UIKit
 import RealmSwift
 //because we inherited the UITableViewController we do not need to set up any IPBOUTlets
-class TodoListViewController: UITableViewController {
+class TodoListViewController: SwipeTableViewController {
 
     
    
@@ -49,7 +49,7 @@ class TodoListViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "toDoItemCell", for: indexPath)
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
         
        
         if let item = todoItems?[indexPath.row] {
@@ -94,14 +94,6 @@ class TodoListViewController: UITableViewController {
 
             }
         }
-        
-        
-        
-        
-        
-        
-        
-        
         
         
         tableView.reloadData()
@@ -163,6 +155,28 @@ class TodoListViewController: UITableViewController {
     tableView.reloadData()
 
     }
+    
+    
+    override func updateModel(at indexPath: IndexPath) {
+        
+        if let cellForDeletion = self.todoItems?[indexPath.row]{
+            
+            
+            do{
+            try realm.write {
+                realm.delete(cellForDeletion)
+            }
+            }catch{
+                print("error deleting Item,\(error)")
+            }
+        }
+        
+        
+        
+    }
+    
+    
+    
     
     
 
