@@ -14,6 +14,7 @@ class TodoListViewController: SwipeTableViewController {
 
     
    
+    @IBOutlet weak var searchBar: UISearchBar!
     
     //these are the TODOS within an array
     var todoItems: Results <Item>?
@@ -34,15 +35,51 @@ class TodoListViewController: SwipeTableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-     
-        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
+    
     
         tableView.separatorStyle = .none
         
         
         
+       
+        
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        
+        
+        
+        guard let colourHex = selectedCategory?.colour else{fatalError()}
+            
+            
+            title = selectedCategory?.name
+            
+            guard let navBar = navigationController?.navigationBar else {fatalError("nav controller does not exist. ")}
+            
+        guard let navBarColour = UIColor(hexString: colourHex) else{fatalError()}
+                
+                navBar.barTintColor = navBarColour
+                
+                navBar.tintColor = ContrastColorOf(navBarColour, returnFlat: true)
+                
+                navBar.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor : ContrastColorOf(navBarColour, returnFlat: true)]
+                
+                
+                searchBar.barTintColor = navBarColour
+                
+        
+        
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        
+        guard let originalColor = UIColor(hexString: "1D9BF6") else{fatalError()}
+        
+        navigationController?.navigationBar.barTintColor = originalColor
+        navigationController?.navigationBar.tintColor = FlatWhite()
+        navigationController?.navigationBar.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor: FlatWhite()]
+    }
+    
     
     
     // Mark -Tableview Datasource Methods
@@ -202,6 +239,14 @@ class TodoListViewController: SwipeTableViewController {
     
 
 }
+
+
+
+
+
+
+
+
 //Mark: - Search Bar Methods
 extension TodoListViewController: UISearchBarDelegate {
 
