@@ -8,6 +8,7 @@
 
 import UIKit
 import RealmSwift
+import ChameleonFramework
 //because we inherited the UITableViewController we do not need to set up any IPBOUTlets
 class TodoListViewController: SwipeTableViewController {
 
@@ -36,6 +37,10 @@ class TodoListViewController: SwipeTableViewController {
      
         print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
     
+        tableView.separatorStyle = .none
+        
+        
+        
     }
 
     
@@ -51,10 +56,26 @@ class TodoListViewController: SwipeTableViewController {
         
         let cell = super.tableView(tableView, cellForRowAt: indexPath)
         
+        
+        
        
         if let item = todoItems?[indexPath.row] {
             
             cell.textLabel?.text = item.title
+            
+            if let colour = UIColor(hexString: selectedCategory!.colour)?.darken(byPercentage: CGFloat(indexPath.row) / CGFloat(todoItems!.count)){
+               
+                
+                
+                cell.backgroundColor = colour
+                cell.textLabel?.textColor = ContrastColorOf(colour, returnFlat: true)
+            }
+            
+//            print("version 1:, \(CGFloat(indexPath.row / todoItems!.count))")
+//            print("version 2:, \(CGFloat(indexPath.row) / CGFloat(todoItems!.count))")
+            
+            
+            
             
             
             //Ternaary operator ===>
